@@ -54,13 +54,22 @@ suspend fun getPdfsFromImages(
             pdfWriter.setSmartMode(true)
             pdfWriter.compressionLevel = 9
             var image = Image(ImageDataFactory.create(imagesTempFiles[0].path))
+           // val pdfDocument = PdfDocument(pdfWriter)
             val pdfDocument = PdfDocument(pdfWriter)
-            val doc = Document(pdfDocument, PageSize(image.imageWidth, image.imageHeight))
+
+            // val doc = Document(pdfDocument, PageSize(image.imageWidth, image.imageHeight))
+            val doc = Document(pdfDocument)
             for (i in imagesTempFiles.indices) {
                 yield()
                 image = Image(ImageDataFactory.create(imagesTempFiles[i].path))
-                pdfDocument.addNewPage(PageSize(image.imageWidth, image.imageHeight))
-                image.setFixedPosition(i + 1, 0f, 0f)
+//                pdfDocument.addNewPage(PageSize(image.imageWidth, image.imageHeight))
+//                image.setFixedPosition(i + 1, 0f, 0f)
+
+                image.scaleToFit(PageSize.A4.width, PageSize.A4.height)
+                val x = (PageSize.A4.width - image.imageScaledWidth) / 2
+                val y = (PageSize.A4.height - image.imageScaledHeight) / 2
+                image.setFixedPosition(i + 1, x, y)
+                pdfDocument.addNewPage(PageSize.A4)
                 doc.add(image)
                 pdfWriter.flush()
             }
